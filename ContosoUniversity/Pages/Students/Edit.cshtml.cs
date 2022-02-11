@@ -90,7 +90,7 @@ public class Edit : PageModel
 		student.LastName = message.LastName;
 		student.EnrollmentDate = message.EnrollmentDate!.Value;
 
-		return;
+		await _db.SaveChangesAsync();
 	}
 
 }

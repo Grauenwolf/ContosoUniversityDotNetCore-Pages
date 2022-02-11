@@ -75,6 +75,6 @@ public class Delete : PageModel
 
 		_db.Departments.Remove(department);
 
-		return;
+		await _db.SaveChangesAsync();
 	}
 }

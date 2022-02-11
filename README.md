@@ -1,4 +1,4 @@
-# Cleaning Clean Architecture - Jimmy Bogard’s Vertical Slice Edition
+# Cleaning Clean Architecture - Vertical Slice Edition
 
 The purpose of this repository is to investigate "Vertical Slice Architecture" and see if it can be improved upon. The goal is to remove complexity without reducing functionality.
 
@@ -30,7 +30,17 @@ This time the use of MediatR is 100% gratuitous. Not only is there no additional
 For example, if you are in an Index page (`Index.cshtml.cs`), then sender is the `OnGetAsync` method of the `Index` class. The handler is the `Index.QueryHandler`, which is an inner class of `Index`.
 
 
+### Fix
 
+The first part of the fix is easy, 
+
+1. Move the necessary DI components (e.g. the database) into the constructor that formally accepted a MediatR object.
+2. Remove the Handler inner classes, leaving the `Handle` functions in outer class. 
+3. Change all calls to `_mediate.Send` to `Handle`.
+4. Ensure the `Handle` method actually call `SaveChanges()`. (Some of them didn't, and that was causing the updated tests to fail.)
+
+
+ 
 
 
 

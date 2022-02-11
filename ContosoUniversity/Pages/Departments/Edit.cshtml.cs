@@ -88,6 +88,6 @@ public class Edit : PageModel
 		dept.RowVersion = message.RowVersion;
 		dept.Administrator = await _db.Instructors.FindAsync(message.Administrator.Id);
 
-		return;
+		await _db.SaveChangesAsync();
 	}
 }

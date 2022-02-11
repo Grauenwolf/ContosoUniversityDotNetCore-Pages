@@ -49,6 +49,7 @@ public class SliceFixture : IAsyncLifetime
 			{
 				services.AddScoped<ContosoUniversity.Pages.Instructors.CreateEdit>();
 				services.AddScoped<ContosoUniversity.Pages.Departments.Create>();
+				services.AddScoped<ContosoUniversity.Pages.Departments.Delete>();
 
 			});
 		}
@@ -77,6 +78,30 @@ public class SliceFixture : IAsyncLifetime
 		}
 	}
 
+	public TestResources GetTestResources()
+	{
+		return new TestResources(_scopeFactory.CreateScope());
+	}
+
+	public class TestResources : IDisposable
+	{
+		public IServiceScope ServiceScope { get; }
+		public SchoolContext Db { get; }
+		public AutoMapper.IConfigurationProvider Mapper { get; }
+		public TestResources(IServiceScope scope)
+		{
+			ServiceScope = scope;
+			Db = scope.ServiceProvider.GetRequiredService<SchoolContext>();
+			Mapper = scope.ServiceProvider.GetRequiredService<AutoMapper.IConfigurationProvider>();
+		}
+
+		public void Dispose()
+		{
+			ServiceScope.Dispose();
+		}
+	}
+
+
 	public async Task<T> ExecuteScopeAsync<T>(Func<IServiceProvider, Task<T>> action)
 	{
 		using var scope = _scopeFactory.CreateScope();
@@ -99,21 +124,23 @@ public class SliceFixture : IAsyncLifetime
 		}
 	}
 
+
+
 	public Task ExecuteAsync<TPage>(Func<TPage, Task> action)
-	=> ExecuteScopeAsync(sp => action(sp.GetService<TPage>()));
+	=> ExecuteScopeAsync(sp => action(sp.GetRequiredService<TPage>()));
 
 	public Task ExecuteDbContextAsync<TPage>(Func<SchoolContext, TPage, Task> action)
-		=> ExecuteScopeAsync(sp => action(sp.GetService<SchoolContext>(), sp.GetService<TPage>()));
+		=> ExecuteScopeAsync(sp => action(sp.GetService<SchoolContext>(), sp.GetRequiredService<TPage>()));
 
 	public Task<TResult> ExecuteAsync<TPage, TResult>(Func<TPage, Task<TResult>> action)
-=> ExecuteScopeAsync(sp => action(sp.GetService<TPage>()));
+=> ExecuteScopeAsync(sp => action(sp.GetRequiredService<TPage>()));
 
 
 	public Task ExecuteDbContextAsync(Func<SchoolContext, Task> action)
 		=> ExecuteScopeAsync(sp => action(sp.GetService<SchoolContext>()));
 
-	//public Task ExecuteDbContextAsync(Func<SchoolContext, ValueTask> action)
-	//	=> ExecuteScopeAsync(sp => action(sp.GetService<SchoolContext>()).AsTask());
+	public Task ExecuteDbContextAsync(Func<SchoolContext, ValueTask> action)
+		=> ExecuteScopeAsync(sp => action(sp.GetService<SchoolContext>()).AsTask());
 
 	//public Task ExecuteDbContextAsync(Func<SchoolContext, IMediator, Task> action)
 	//	=> ExecuteScopeAsync(sp => action(sp.GetService<SchoolContext>(), sp.GetService<IMediator>()));
@@ -121,8 +148,8 @@ public class SliceFixture : IAsyncLifetime
 	public Task<T> ExecuteDbContextAsync<T>(Func<SchoolContext, Task<T>> action)
 		=> ExecuteScopeAsync(sp => action(sp.GetService<SchoolContext>()));
 
-	//public Task<T> ExecuteDbContextAsync<T>(Func<SchoolContext, ValueTask<T>> action)
-	//	=> ExecuteScopeAsync(sp => action(sp.GetService<SchoolContext>()).AsTask());
+	public Task<T> ExecuteDbContextAsync<T>(Func<SchoolContext, ValueTask<T>> action)
+		=> ExecuteScopeAsync(sp => action(sp.GetService<SchoolContext>()).AsTask());
 
 	//public Task<T> ExecuteDbContextAsync<T>(Func<SchoolContext, IMediator, Task<T>> action)
 	//	=> ExecuteScopeAsync(sp => action(sp.GetService<SchoolContext>(), sp.GetService<IMediator>()));

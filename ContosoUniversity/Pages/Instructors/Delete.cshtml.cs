@@ -96,7 +96,7 @@ public class Delete : PageModel
 			department.InstructorId = null;
 		}
 
-		return;
+		await _db.SaveChangesAsync();
 	}
 
 }

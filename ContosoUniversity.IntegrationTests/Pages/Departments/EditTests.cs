@@ -1,11 +1,11 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using ContosoUniversity.Models;
+﻿using ContosoUniversity.Models;
 using ContosoUniversity.Pages.Departments;
 using ContosoUniversity.Pages.Instructors;
 using Microsoft.EntityFrameworkCore;
 using Shouldly;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace ContosoUniversity.IntegrationTests.Pages.Departments;
@@ -13,89 +13,90 @@ namespace ContosoUniversity.IntegrationTests.Pages.Departments;
 [Collection(nameof(SliceFixture))]
 public class EditTests
 {
-    private readonly SliceFixture _fixture;
+	private readonly SliceFixture _fixture;
 
-    public EditTests(SliceFixture fixture) => _fixture = fixture;
+	public EditTests(SliceFixture fixture) => _fixture = fixture;
 
-    [Fact]
-    public async Task Should_get_edit_department_details()
-    {
-        var adminId = await _fixture.SendAsync(new CreateEdit.Command
-        {
-            FirstMidName = "George",
-            LastName = "Costanza",
-            HireDate = DateTime.Today
-        });
+	[Fact]
+	public async Task Should_get_edit_department_details()
+	{
+		using var scope = _fixture.GetTestResources();
+		var adminId = await (new CreateEdit(scope.Db, scope.Mapper)).Handle(new CreateEdit.Command
+		{
+			FirstMidName = "George",
+			LastName = "Costanza",
+			HireDate = DateTime.Today
+		});
 
-        var dept = new Department
-        {
-            Name = "History",
-            InstructorId = adminId,
-            Budget = 123m,
-            StartDate = DateTime.Today
-        };
-        await _fixture.InsertAsync(dept);
+		var dept = new Department
+		{
+			Name = "History",
+			InstructorId = adminId,
+			Budget = 123m,
+			StartDate = DateTime.Today
+		};
+		await _fixture.InsertAsync(dept);
 
-        var query = new Edit.Query
-        {
-            Id = dept.Id
-        };
+		var query = new Edit.Query
+		{
+			Id = dept.Id
+		};
 
-        var result = await _fixture.SendAsync(query);
+		var result = await (new Edit(scope.Db, scope.Mapper)).Handle(query);
 
-        result.ShouldNotBeNull();
-        result.Name.ShouldBe(dept.Name);
-        result.Administrator.Id.ShouldBe(adminId);
-    }
+		result.ShouldNotBeNull();
+		result.Name.ShouldBe(dept.Name);
+		result.Administrator.Id.ShouldBe(adminId);
+	}
 
-    [Fact]
-    public async Task Should_edit_department()
-    {
-        var adminId = await _fixture.SendAsync(new CreateEdit.Command
-        {
-            FirstMidName = "George",
-            LastName = "Costanza",
-            HireDate = DateTime.Today
-        });
+	[Fact]
+	public async Task Should_edit_department()
+	{
+		using var scope = _fixture.GetTestResources();
+		var adminId = await (new CreateEdit(scope.Db, scope.Mapper)).Handle(new CreateEdit.Command
+		{
+			FirstMidName = "George",
+			LastName = "Costanza",
+			HireDate = DateTime.Today
+		});
 
-        var admin2Id = await _fixture.SendAsync(new CreateEdit.Command
-        {
-            FirstMidName = "George",
-            LastName = "Costanza",
-            HireDate = DateTime.Today
-        });
+		var admin2Id = await (new CreateEdit(scope.Db, scope.Mapper)).Handle(new CreateEdit.Command
+		{
+			FirstMidName = "George",
+			LastName = "Costanza",
+			HireDate = DateTime.Today
+		});
 
-        var dept = new Department
-        {
-            Name = "History",
-            InstructorId = adminId,
-            Budget = 123m,
-            StartDate = DateTime.Today
-        };
-        await _fixture.InsertAsync(dept);
+		var dept = new Department
+		{
+			Name = "History",
+			InstructorId = adminId,
+			Budget = 123m,
+			StartDate = DateTime.Today
+		};
+		await _fixture.InsertAsync(dept);
 
-        Edit.Command command = null;
-        await _fixture.ExecuteDbContextAsync(async (ctxt, mediator) =>
-        {
-            var admin2 = await _fixture.FindAsync<Instructor>(admin2Id);
+		Edit.Command command = null;
 
-            command = new Edit.Command
-            {
-                Id = dept.Id,
-                Name = "English",
-                Administrator = admin2,
-                StartDate = DateTime.Today.AddDays(-1),
-                Budget = 456m
-            };
+		var admin2 = await _fixture.FindAsync<Instructor>(admin2Id);
 
-            await mediator.Send(command);
-        });
+		command = new Edit.Command
+		{
+			Id = dept.Id,
+			Name = "English",
+			Administrator = admin2,
+			StartDate = DateTime.Today.AddDays(-1),
+			Budget = 456m
+		};
 
-        var result = await _fixture.ExecuteDbContextAsync(db => db.Departments.Where(d => d.Id == dept.Id).Include(d => d.Administrator).SingleOrDefaultAsync());
+		await (new Edit(scope.Db, scope.Mapper)).Handle(command);
 
-        result.Name.ShouldBe(command.Name);
-        result.Administrator.Id.ShouldBe(command.Administrator.Id);
-        result.StartDate.ShouldBe(command.StartDate.GetValueOrDefault());
-        result.Budget.ShouldBe(command.Budget.GetValueOrDefault());
-    }
+
+		var result = await _fixture.ExecuteDbContextAsync(db => db.Departments.Where(d => d.Id == dept.Id).Include(d => d.Administrator).SingleOrDefaultAsync());
+
+		result.Name.ShouldBe(command.Name);
+		result.Administrator.Id.ShouldBe(command.Administrator.Id);
+		result.StartDate.ShouldBe(command.StartDate.GetValueOrDefault());
+		result.Budget.ShouldBe(command.Budget.GetValueOrDefault());
+	}
 }

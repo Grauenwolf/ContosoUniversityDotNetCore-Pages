@@ -76,8 +76,7 @@ public class Delete : PageModel
 		var course = await _db.Courses.FindAsync(message.Id);
 
 		_db.Courses.Remove(course);
-
-		return;
+		await _db.SaveChangesAsync();
 	}
 
 }

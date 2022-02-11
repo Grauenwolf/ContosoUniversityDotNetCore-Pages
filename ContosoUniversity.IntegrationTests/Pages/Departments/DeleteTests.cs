@@ -1,10 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using ContosoUniversity.Models;
+﻿using ContosoUniversity.Models;
 using ContosoUniversity.Pages.Instructors;
 using Microsoft.EntityFrameworkCore;
 using Shouldly;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 using Delete = ContosoUniversity.Pages.Departments.Delete;
 
@@ -13,39 +13,41 @@ namespace ContosoUniversity.IntegrationTests.Pages.Departments;
 [Collection(nameof(SliceFixture))]
 public class DeleteTests
 {
-    private readonly SliceFixture _fixture;
+	private readonly SliceFixture _fixture;
 
-    public DeleteTests(SliceFixture fixture) => _fixture = fixture;
+	public DeleteTests(SliceFixture fixture) => _fixture = fixture;
 
-    [Fact]
-    public async Task Should_delete_department()
-    {
-        var adminId = await _fixture.SendAsync(new CreateEdit.Command
-        {
-            FirstMidName = "George",
-            LastName = "Costanza",
-            HireDate = DateTime.Today
-        });
+	[Fact]
+	public async Task Should_delete_department()
+	{
+		using var scope = _fixture.GetTestResources();
 
-        var dept = new Department
-        {
-            Name = "History",
-            InstructorId = adminId,
-            Budget = 123m,
-            StartDate = DateTime.Today
-        };
-        await _fixture.InsertAsync(dept);
+		var adminId = await (new CreateEdit(scope.Db, scope.Mapper)).Handle(new CreateEdit.Command
+		{
+			FirstMidName = "George",
+			LastName = "Costanza",
+			HireDate = DateTime.Today
+		});
 
-        var command = new Delete.Command
-        {
-            Id = dept.Id,
-            RowVersion = dept.RowVersion
-        };
+		var dept = new Department
+		{
+			Name = "History",
+			InstructorId = adminId,
+			Budget = 123m,
+			StartDate = DateTime.Today
+		};
+		await _fixture.InsertAsync(dept);
 
-        await _fixture.SendAsync(command);
+		var command = new Delete.Command
+		{
+			Id = dept.Id,
+			RowVersion = dept.RowVersion
+		};
 
-        var any = await _fixture.ExecuteDbContextAsync(db => db.Departments.Where(d => d.Id == command.Id).AnyAsync());
+		await (new Delete(scope.Db, scope.Mapper)).Handle(command);
 
-        any.ShouldBeFalse();
-    }
+		var any = await _fixture.ExecuteDbContextAsync(db => db.Departments.Where(d => d.Id == command.Id).AnyAsync());
+
+		any.ShouldBeFalse();
+	}
 }

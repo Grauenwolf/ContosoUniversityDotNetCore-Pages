@@ -87,6 +87,7 @@ public class Edit : PageModel
 		course.Department = request.Department;
 		course.Credits = request.Credits!.Value;
 
-		return;
+		await _db.SaveChangesAsync();
+
 	}
 }

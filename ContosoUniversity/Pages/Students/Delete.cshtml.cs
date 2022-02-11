@@ -65,7 +65,7 @@ public class Delete : PageModel
 	{
 		_db.Students.Remove(await _db.Students.FindAsync(message.Id));
 
-		return;
+		await _db.SaveChangesAsync();
 	}
 
 

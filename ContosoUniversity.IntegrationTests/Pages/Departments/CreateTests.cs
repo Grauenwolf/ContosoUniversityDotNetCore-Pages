@@ -20,30 +20,31 @@ public class CreateTests
 	[Fact]
 	public async Task Should_create_new_department()
 	{
-		var adminId = await _fixture.ExecuteAsync<CreateEdit, int>(p => p.Handle(
+		using var scope = _fixture.GetTestResources();
+
+		var adminId = await (new CreateEdit(scope.Db, scope.Mapper)).Handle(
 			new CreateEdit.Command
 			{
 				FirstMidName = "George",
 				LastName = "Costanza",
 				HireDate = DateTime.Today
-			}));
+			});
 
 		Create.Command command = null;
 
-		await _fixture.ExecuteDbContextAsync<Create>(async (db, p) =>
-			{
-				var admin = await db.Instructors.FindAsync(adminId);
 
-				command = new Create.Command
-				{
-					Budget = 10m,
-					Name = "Engineering",
-					StartDate = DateTime.Now.Date,
-					Administrator = admin
-				};
+		var admin = await scope.Db.Instructors.FindAsync(adminId);
 
-				await p.Handle(command);
-			});
+		command = new Create.Command
+		{
+			Budget = 10m,
+			Name = "Engineering",
+			StartDate = DateTime.Now.Date,
+			Administrator = admin
+		};
+
+		await (new Create(scope.Db, scope.Mapper)).Handle(command);
+
 
 		var created = await _fixture.ExecuteDbContextAsync(db => db.Departments.Where(d => d.Name == command.Name).SingleOrDefaultAsync());
 

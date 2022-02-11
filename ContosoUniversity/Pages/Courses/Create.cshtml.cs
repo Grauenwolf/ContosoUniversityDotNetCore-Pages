@@ -1,4 +1,3 @@
-using AutoMapper;
 using ContosoUniversity.Data;
 using ContosoUniversity.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -10,12 +9,10 @@ namespace ContosoUniversity.Pages.Courses;
 public class Create : PageModel
 {
 	private readonly SchoolContext _db;
-	private readonly IConfigurationProvider _configuration;
 
-	public Create(SchoolContext db, IConfigurationProvider configuration)
+	public Create(SchoolContext db)
 	{
 		_db = db;
-		_configuration = configuration;
 	}
 
 	[BindProperty]

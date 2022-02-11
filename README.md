@@ -17,6 +17,19 @@ Once that is done, you can run the setup instructions at the bottom of this page
 
 All tests are passing and the website appears to be functioning normally.
 
+## Round 1 - Remove MediatR
+
+Throughout the Cleaning Clean Architecture series, a common theme is the unnecessary use of an internal dispatcher. Some use MediatR, others roll their own. 
+
+In our first Cleaning Clean Architecture repository, MediatR was used to actually add functionality. That functionality was better expressed as ASP.NET Core Middleware, but at least it existed.
+
+In our second outing, the internal dispatcher had the illusion of functionality by doing some light logging and DI. Far less impressive, but at least it hinted at what was possible.
+
+This time the use of MediatR is 100% gratuitous. Not only is there no additional functionality added, the handler for the MediatR message is in the same class as the sender.
+
+For example, if you are in an Index page (`Index.cshtml.cs`), then sender is the `OnGetAsync` method of the `Index` class. The handler is the `Index.QueryHandler`, which is an inner class of `Index`.
+
+
 
 
 

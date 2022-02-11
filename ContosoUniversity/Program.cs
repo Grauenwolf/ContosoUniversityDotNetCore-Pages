@@ -3,7 +3,6 @@ using ContosoUniversity.Infrastructure;
 using ContosoUniversity.Infrastructure.Tags;
 using FluentValidation.AspNetCore;
 using HtmlTags;
-using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -22,43 +21,41 @@ app.Run();
 
 static void RegisterServices(WebApplicationBuilder builder)
 {
-    var services = builder.Services;
+	var services = builder.Services;
 
-    services.AddMiniProfiler().AddEntityFramework();
+	services.AddMiniProfiler().AddEntityFramework();
 
-    services.AddDbContext<SchoolContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+	services.AddDbContext<SchoolContext>(options =>
+		options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-    services.AddAutoMapper(typeof(Program));
+	services.AddAutoMapper(typeof(Program));
 
-    services.AddMediatR(typeof(Program));
+	services.AddHtmlTags(new TagConventions());
 
-    services.AddHtmlTags(new TagConventions());
+	services.AddRazorPages(opt =>
+		{
+			opt.Conventions.ConfigureFilter(new DbContextTransactionPageFilter());
+			opt.Conventions.ConfigureFilter(new ValidatorPageFilter());
+		})
+		.AddFluentValidation(cfg => { cfg.RegisterValidatorsFromAssemblyContaining<Program>(); });
 
-    services.AddRazorPages(opt =>
-        {
-            opt.Conventions.ConfigureFilter(new DbContextTransactionPageFilter());
-            opt.Conventions.ConfigureFilter(new ValidatorPageFilter());
-        })
-        .AddFluentValidation(cfg => { cfg.RegisterValidatorsFromAssemblyContaining<Program>(); });
-
-    services.AddMvc(opt => opt.ModelBinderProviders.Insert(0, new EntityModelBinderProvider()));
+	services.AddMvc(opt => opt.ModelBinderProviders.Insert(0, new EntityModelBinderProvider()));
 }
 
 static void ConfigureApplication(WebApplication app)
 {
-    app.UseMiniProfiler();
+	app.UseMiniProfiler();
 
-    if (!app.Environment.IsDevelopment())
-    {
-        app.UseExceptionHandler("/Error");
-        app.UseHsts();
-    }
+	if (!app.Environment.IsDevelopment())
+	{
+		app.UseExceptionHandler("/Error");
+		app.UseHsts();
+	}
 
-    app.UseHttpsRedirection();
-    app.UseStaticFiles();
+	app.UseHttpsRedirection();
+	app.UseStaticFiles();
 
-    app.UseAuthorization();
+	app.UseAuthorization();
 
-    app.MapRazorPages();
+	app.MapRazorPages();
 }

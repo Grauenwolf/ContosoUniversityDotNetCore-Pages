@@ -215,3 +215,4 @@ __pycache__/
 .DS_Store
 aspnetcore/fundamentals/servers/httpsys/_static/Thumbs.db
 /.cr
+/ContosoUniversityDatabase/ContosoUniversityDatabase.jfm

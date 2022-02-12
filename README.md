@@ -39,9 +39,13 @@ The first part of the fix is easy,
 3. Change all calls to `_mediate.Send` to `Handle`.
 4. Ensure the `Handle` method actually call `SaveChanges()`. (Some of them didn't, and that was causing the updated tests to fail.)
 
-
+## Round 2 - Fix Page Sizes
  
+Currently the page size for Student is hard-coded inside the `Handle` method. This is the wrong place. Page size is a UI concern and the UI may wish to vary it depending on things such as user input or the size of the screen.
 
+So we're going to move it from the data access method, `Handle`, to the UI method, `OnGetAsync`. 
+
+At the same time, we're going to change the default page size to 10. While there is no perfect number, certain values such as 5, 10, 25, 50, and 100 are common. Conversely, numbers such as 3, 4, 8, and 9 are not expected by the user. So upon seeing such counts, will think they are at the end of the list.
 
 
 # ContosoUniversity on ASP.NET Core 6.0 on .NET 6 and Razor Pages

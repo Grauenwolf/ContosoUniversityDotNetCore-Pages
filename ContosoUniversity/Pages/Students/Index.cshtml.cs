@@ -27,11 +27,16 @@ public class Index : PageModel
 	public async Task OnGetAsync(string sortOrder,
 		string currentFilter, string searchString, int? pageIndex)
 	{
-		Data = await Handle(new Query { CurrentFilter = currentFilter, Page = pageIndex, SearchString = searchString, SortOrder = sortOrder });
+		int pageSize = 10;
+
+		Data = await Handle(new Query { CurrentFilter = currentFilter, Page = pageIndex, PageSize = pageSize, SearchString = searchString, SortOrder = sortOrder });
 	}
 
 	public async Task<Result> Handle(Query message)
 	{
+		if (message.PageSize <= 0)
+			throw new ArgumentOutOfRangeException(nameof(message.PageSize), "Page size must be greater than zero.");
+
 		var searchString = message.SearchString ?? message.CurrentFilter;
 
 		IQueryable<Student> students = _db.Students;
@@ -49,12 +54,11 @@ public class Index : PageModel
 			_ => students.OrderBy(s => s.LastName)
 		};
 
-		int pageSize = 3;
 		int pageNumber = (message.SearchString == null ? message.Page : 1) ?? 1;
 
 		var results = await students
 			.ProjectTo<Model>(_configuration)
-			.PaginatedListAsync(pageNumber, pageSize);
+			.PaginatedListAsync(pageNumber, message.PageSize);
 
 		var model = new Result
 		{
@@ -75,6 +79,7 @@ public class Index : PageModel
 		public string CurrentFilter { get; init; }
 		public string SearchString { get; init; }
 		public int? Page { get; init; }
+		public int PageSize { get; init; }
 	}
 
 	public record Result

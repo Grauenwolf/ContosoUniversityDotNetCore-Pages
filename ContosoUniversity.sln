@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29424.173
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContosoUniversity", "ContosoUniversity\ContosoUniversity.csproj", "{DDBC05AD-34FD-43B7-B0D1-45819DEC4AA1}"
 EndProject
@@ -28,6 +28,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		.github\workflows\main.yaml = .github\workflows\main.yaml
 	EndProjectSection
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "ContosoUniversityDatabase", "ContosoUniversityDatabase\ContosoUniversityDatabase.sqlproj", "{EF8F432D-9B72-4D23-A422-E0709F160E4C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +44,12 @@ Global
 		{70FF0FF8-4876-4A7A-AE4A-53C92A2C1531}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{70FF0FF8-4876-4A7A-AE4A-53C92A2C1531}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{70FF0FF8-4876-4A7A-AE4A-53C92A2C1531}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF8F432D-9B72-4D23-A422-E0709F160E4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF8F432D-9B72-4D23-A422-E0709F160E4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF8F432D-9B72-4D23-A422-E0709F160E4C}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{EF8F432D-9B72-4D23-A422-E0709F160E4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF8F432D-9B72-4D23-A422-E0709F160E4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF8F432D-9B72-4D23-A422-E0709F160E4C}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -7,13 +7,7 @@ To order to see the transformation incrementally, a branch has been created for 
 
 ## Round 0 - Base State Validation
 
-Before trying to run the setup scripts, it is helpful to disable PowerShell's security. This is generally considered safe because an unsigned PowerShell script is no more dangerous than a CMD style batch file, and the latter is not blocked by default.
-
-```
-Set-ExecutionPolicy -ExecutionPolicy Unrestricted
-```
-
-Once that is done, you can run the setup instructions at the bottom of this page to install the databases. There is a separate one for the website and the integration tests.
+Use SSDT to deploy the "local" and "local test" databases. (These instructions supersede the PowerShell scripts.)
 
 All tests are passing and the website appears to be functioning normally.
 
@@ -47,6 +41,18 @@ So we're going to move it from the data access method, `Handle`, to the UI metho
 
 At the same time, we're going to change the default page size to 10. While there is no perfect number, certain values such as 5, 10, 25, 50, and 100 are common. Conversely, numbers such as 3, 4, 8, and 9 are not expected by the user. So upon seeing such counts, will think they are at the end of the list.
 
+
+## Round 3 - Managing the SQL 
+
+The database schema is stored in an unusual place. It consists of two SQL scripts in the website's App_Data folder. That's not really an ergonomic way of handling database schema. Developers aren't likely to think to look there, assuming instead that the database schema is managed by EF Core. 
+
+In the short term, dropping all of the tables into one script is like dropping all of your classes into one file. While technically allowed, it is considered bad form and makes it harder to find code of interest.
+
+Moreover, over time the number of scripts will increase. Each time a table or column is altered, a new script needs to be created. Numbering becomes a concern when branching-and-merging come into play. And you have to read all of the scripts in order to see what the end-state looks like.
+
+Fortunately, there is an elegant alternative called SQL Server Data Tools or SSDT.
+
+Note: In order to avoid breaking the existing PowerShell scripts, the `App_Data\runAfterCreateDatabase\` folder will not be removed at this time.
 
 # ContosoUniversity on ASP.NET Core 6.0 on .NET 6 and Razor Pages
 

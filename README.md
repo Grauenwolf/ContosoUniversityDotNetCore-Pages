@@ -1,4 +1,4 @@
-# Cleaning Clean Architecture - Jimmy Bogard’s Vertical Slice Edition
+# Cleaning Clean Architecture - Vertical Slice Edition
 
 The purpose of this repository is to investigate "Vertical Slice Architecture" and see if it can be improved upon. The goal is to remove complexity without reducing functionality.
 

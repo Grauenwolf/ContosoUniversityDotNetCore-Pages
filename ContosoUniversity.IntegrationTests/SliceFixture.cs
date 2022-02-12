@@ -47,9 +47,6 @@ public class SliceFixture : IAsyncLifetime
 
 			builder.ConfigureServices(services =>
 			{
-				services.AddScoped<ContosoUniversity.Pages.Instructors.CreateEdit>();
-				services.AddScoped<ContosoUniversity.Pages.Departments.Create>();
-				services.AddScoped<ContosoUniversity.Pages.Departments.Delete>();
 
 			});
 		}
@@ -124,47 +121,12 @@ public class SliceFixture : IAsyncLifetime
 		}
 	}
 
-
-
-	public Task ExecuteAsync<TPage>(Func<TPage, Task> action)
-	=> ExecuteScopeAsync(sp => action(sp.GetRequiredService<TPage>()));
-
-	public Task ExecuteDbContextAsync<TPage>(Func<SchoolContext, TPage, Task> action)
-		=> ExecuteScopeAsync(sp => action(sp.GetService<SchoolContext>(), sp.GetRequiredService<TPage>()));
-
-	public Task<TResult> ExecuteAsync<TPage, TResult>(Func<TPage, Task<TResult>> action)
-=> ExecuteScopeAsync(sp => action(sp.GetRequiredService<TPage>()));
-
-
-	public Task ExecuteDbContextAsync(Func<SchoolContext, Task> action)
-		=> ExecuteScopeAsync(sp => action(sp.GetService<SchoolContext>()));
-
-	public Task ExecuteDbContextAsync(Func<SchoolContext, ValueTask> action)
-		=> ExecuteScopeAsync(sp => action(sp.GetService<SchoolContext>()).AsTask());
-
-	//public Task ExecuteDbContextAsync(Func<SchoolContext, IMediator, Task> action)
-	//	=> ExecuteScopeAsync(sp => action(sp.GetService<SchoolContext>(), sp.GetService<IMediator>()));
-
 	public Task<T> ExecuteDbContextAsync<T>(Func<SchoolContext, Task<T>> action)
 		=> ExecuteScopeAsync(sp => action(sp.GetService<SchoolContext>()));
 
 	public Task<T> ExecuteDbContextAsync<T>(Func<SchoolContext, ValueTask<T>> action)
 		=> ExecuteScopeAsync(sp => action(sp.GetService<SchoolContext>()).AsTask());
 
-	//public Task<T> ExecuteDbContextAsync<T>(Func<SchoolContext, IMediator, Task<T>> action)
-	//	=> ExecuteScopeAsync(sp => action(sp.GetService<SchoolContext>(), sp.GetService<IMediator>()));
-
-	public Task InsertAsync<T>(params T[] entities) where T : class
-	{
-		return ExecuteDbContextAsync(db =>
-		{
-			foreach (var entity in entities)
-			{
-				db.Set<T>().Add(entity);
-			}
-			return db.SaveChangesAsync();
-		});
-	}
 
 	public Task InsertAsync<TEntity>(TEntity entity) where TEntity : class
 	{
@@ -227,26 +189,6 @@ public class SliceFixture : IAsyncLifetime
 		return ExecuteDbContextAsync(db => db.Set<T>().FindAsync(id).AsTask());
 	}
 
-	//public Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request)
-	//{
-	//	return ExecuteScopeAsync(sp =>
-	//	{
-	//		var mediator = sp.GetRequiredService<IMediator>();
-
-	//		return mediator.Send(request);
-	//	});
-	//}
-
-	//public Task SendAsync(IRequest request)
-	//{
-	//	return ExecuteScopeAsync(sp =>
-	//	{
-	//		var mediator = sp.GetRequiredService<IMediator>();
-
-	//		return mediator.Send(request);
-	//	});
-	//}
-
 	private int _courseNumber = 1;
 
 	public int NextCourseNumber() => Interlocked.Increment(ref _courseNumber);
@@ -259,19 +201,5 @@ public class SliceFixture : IAsyncLifetime
 		_factory?.Dispose();
 		return Task.CompletedTask;
 	}
-	//public async Task<TResult> InvokeHandle<TPage, TResult>(object command)
-	//{
-	//	using var scope = _scopeFactory.CreateScope();
-	//	var target = scope.ServiceProvider.GetRequiredService<TPage>();
-	//	dynamic dTarget = target;
-	//	return await dTarget.Handle(command);
-	//}
 
-	//public async Task InvokeHandle<TPage>(object command)
-	//{
-	//	using var scope = _scopeFactory.CreateScope();
-	//	var target = scope.ServiceProvider.GetRequiredService<TPage>();
-	//	dynamic dTarget = target;
-	//	await dTarget.Handle(command);
-	//}
 }

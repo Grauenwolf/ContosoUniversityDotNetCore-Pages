@@ -35,7 +35,7 @@ public class IndexTests
 		};
 		await _fixture.InsertAsync(student1, student2);
 
-		var query = new Index.Query { CurrentFilter = lastName };
+		var query = new Index.Query { CurrentFilter = lastName, PageSize = 100 };
 
 		var result = await (new Index(scope.Db, scope.Mapper)).Handle(query);
 
@@ -64,7 +64,7 @@ public class IndexTests
 		};
 		await _fixture.InsertAsync(student1, student2);
 
-		var query = new Index.Query { CurrentFilter = lastName, SortOrder = "name_desc" };
+		var query = new Index.Query { CurrentFilter = lastName, SortOrder = "name_desc", PageSize = 100 };
 
 		var result = await (new Index(scope.Db, scope.Mapper)).Handle(query);
 
